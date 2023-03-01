@@ -1,12 +1,4 @@
 ---
-- name: check if inside container
-  command: grep -qa container=lxc /proc/1/environ
-  register: container_env
-  ignore_errors: yes
-
-- name: set fact inside container
-  set_fact:
-    inside_container: "{% if container_env.rc == 0 %}True{% else %}False{% endif %}"
 
 - name: enable overcommit in sysctl
   sysctl:
