@@ -55,11 +55,23 @@
     state: directory
     owner: "{{ redis_user }}"
 
-- name: install redis
+- name: Get current redis version
+  command: "{{ redis_install_dir }}/bin/redis-server --version"
+  ignore_errors: true
+  register: _current_redis_info
+
+- name: Extract version using regex
+  set_fact:
+    _current_redis_version: "{{ _current_redis_info.stdout
+                                | regex_search('v=([0-9.]+)', '\\1') }}"
+
+- name: install/update redis
   shell: umask 0022 && make PREFIX={{ redis_install_dir }} install
   args:
     chdir: /usr/local/src/redis-{{ redis_version }}
-    creates: "{{ redis_install_dir }}/bin/redis-server"
+  when:
+    - _current_redis_version is defined
+    - redis_version not in _current_redis_version
 
 - name: list redis binaries to add to alternatives
   command: ls -1 {{ redis_install_dir }}/bin
