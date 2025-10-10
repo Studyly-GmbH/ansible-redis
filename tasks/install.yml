@@ -60,7 +60,7 @@
   ignore_errors: true
   register: _current_redis_info
 
-- name: Extract version using regex
+- name: Extract version from registered result using regex
   set_fact:
     _current_redis_version: "{{ _current_redis_info.stdout
                                 | regex_search('v=([0-9.]+)', '\\1') }}"
@@ -70,7 +70,6 @@
   args:
     chdir: /usr/local/src/redis-{{ redis_version }}
   when:
-    - _current_redis_version is defined
     - redis_version not in _current_redis_version
 
 - name: list redis binaries to add to alternatives
